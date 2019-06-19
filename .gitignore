@@ -188,3 +188,5 @@ Microsoft.WindowsAzure.Storage/build.*/
 # ==========================
 
 .DS_Store
+
+.vs/
