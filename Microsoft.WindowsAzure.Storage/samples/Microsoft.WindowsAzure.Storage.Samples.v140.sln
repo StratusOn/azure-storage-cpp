@@ -16,6 +16,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Microsoft.WindowsAzure.Stor
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Microsoft.WindowsAzure.Storage.FilesGettingStarted.v140", "FilesGettingStarted\Microsoft.WindowsAzure.Storage.FilesGettingStarted.v140.vcxproj", "{69B7A340-02D1-4685-9319-4804558321A1}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Microsoft.WindowsAzure.Storage.IncrementalSnapshotsGettingStarted.v140", "IncrementalSnapshotsGettingStarted\Microsoft.WindowsAzure.Storage.IncrementalSnapshotsGettingStarted.v140.vcxproj", "{D78554E5-F75B-452B-AF72-905349DBEE4B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -68,8 +70,17 @@ Global
 		{69B7A340-02D1-4685-9319-4804558321A1}.Release|Win32.ActiveCfg = Release|Win32
 		{69B7A340-02D1-4685-9319-4804558321A1}.Release|Win32.Build.0 = Release|Win32
 		{69B7A340-02D1-4685-9319-4804558321A1}.Release|x64.ActiveCfg = Release|Win32
+		{D78554E5-F75B-452B-AF72-905349DBEE4B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D78554E5-F75B-452B-AF72-905349DBEE4B}.Debug|Win32.Build.0 = Debug|Win32
+		{D78554E5-F75B-452B-AF72-905349DBEE4B}.Debug|x64.ActiveCfg = Debug|Win32
+		{D78554E5-F75B-452B-AF72-905349DBEE4B}.Release|Win32.ActiveCfg = Release|Win32
+		{D78554E5-F75B-452B-AF72-905349DBEE4B}.Release|Win32.Build.0 = Release|Win32
+		{D78554E5-F75B-452B-AF72-905349DBEE4B}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7D543264-D8DC-4FD1-99A0-2E5449F07446}
 	EndGlobalSection
 EndGlobal
