@@ -30,31 +30,28 @@
 #include <sstream>
 
 namespace azure { namespace authentication { namespace utility {
-	
+
 	typedef std::wstring string_t;
 
-	pplx::task<utility::string_t> http_post_async(
+	pplx::task<utility::string_t> http_call_async(
 		const utility::string_t& uri,
 		const utility::string_t& body,
 		const web::http::method method,
 		const utility::string_t& content_type,
-		const bool is_msi = false)
+		const web::http::http_headers& headers)
 	{
 		web::http::client::http_client client(uri);
 
 		web::http::http_request request(web::http::methods::POST);
 		request.set_body(body, content_type);
-		if (is_msi)
-		{
-			request.headers().add(_XPLATSTR("Metadata"), _XPLATSTR("true"));
-		}
+		request.headers() = headers;
 
 		return client.request(request).then([](web::http::http_response response)
 			{
 				//ucout << _XPLATSTR("Response Status Code: ") << response.status_code() << std::endl;
 				//ucout << _XPLATSTR("Content type: ") << response.headers().content_type() << std::endl;
 				//ucout << _XPLATSTR("Content length: ") << response.headers().content_length() << std::endl;
-
+				
 				if (response.headers().content_length() == 0 || response.status_code() != 200)
 				{
 					return utility::string_t(_XPLATSTR(""));
@@ -88,8 +85,8 @@ namespace azure { namespace authentication { namespace utility {
 		payload_body.append(url_encoded_resource);
 
 		utility::string_t content_type(_XPLATSTR("application/x-www-form-urlencoded"));
-
-		return http_post_async(auth_uri, payload_body, web::http::methods::POST, content_type);
+		web::http::http_headers headers;
+		return http_call_async(auth_uri, payload_body, web::http::methods::POST, content_type, headers);
 	}
 
 	pplx::task<utility::string_t> get_access_token_from_managed_identities(
@@ -104,7 +101,9 @@ namespace azure { namespace authentication { namespace utility {
 		utility::string_t payload_body(_XPLATSTR(""));
 		utility::string_t content_type(_XPLATSTR("text/plain"));
 
-		return http_post_async(auth_uri, payload_body, web::http::methods::GET, content_type, true);
+		web::http::http_headers headers;
+		headers.add(_XPLATSTR("Metadata"), _XPLATSTR("true"));
+		return http_call_async(auth_uri, payload_body, web::http::methods::GET, content_type, headers);
 	}
 }}} // namespace azure::authentication::utility
 
