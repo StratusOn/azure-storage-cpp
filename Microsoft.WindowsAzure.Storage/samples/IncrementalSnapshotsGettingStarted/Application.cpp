@@ -33,7 +33,7 @@ namespace azure { namespace authentication { namespace utility {
 
 	typedef std::wstring string_t;
 
-	pplx::task<utility::string_t> http_call_async(
+	pplx::task<web::json::value> http_call_async(
 		const utility::string_t& uri,
 		const utility::string_t& body,
 		const web::http::method method,
@@ -51,20 +51,12 @@ namespace azure { namespace authentication { namespace utility {
 				//ucout << _XPLATSTR("Response Status Code: ") << response.status_code() << std::endl;
 				//ucout << _XPLATSTR("Content type: ") << response.headers().content_type() << std::endl;
 				//ucout << _XPLATSTR("Content length: ") << response.headers().content_length() << std::endl;
-				
-				if (response.headers().content_length() == 0 || response.status_code() != 200)
-				{
-					return utility::string_t(_XPLATSTR(""));
-				}
 
-				web::json::value json_object = response.extract_json().get();
-				utility::string_t access_token = json_object.at(_XPLATSTR("access_token")).as_string();
-
-				return access_token;
+				return response.extract_json().get();
 			});
 	}
 
-	pplx::task<utility::string_t> get_access_token_from_service_principal(
+	pplx::task<utility::string_t> get_access_token_from_service_principal_async(
 		const utility::string_t& authority,
 		const utility::string_t& resource,
 		const utility::string_t& tenant_id,
@@ -86,10 +78,14 @@ namespace azure { namespace authentication { namespace utility {
 
 		utility::string_t content_type(_XPLATSTR("application/x-www-form-urlencoded"));
 		web::http::http_headers headers;
-		return http_call_async(auth_uri, payload_body, web::http::methods::POST, content_type, headers);
+
+		return http_call_async(auth_uri, payload_body, web::http::methods::POST, content_type, headers).then([](web::json::value json_object)
+			{
+				return json_object.at(_XPLATSTR("access_token")).as_string();
+			});
 	}
 
-	pplx::task<utility::string_t> get_access_token_from_managed_identities(
+	pplx::task<utility::string_t> get_access_token_from_managed_identities_async(
 		const utility::string_t& managed_identity_endpoint,
 		const utility::string_t& resource)
 	{
@@ -100,10 +96,13 @@ namespace azure { namespace authentication { namespace utility {
 
 		utility::string_t payload_body(_XPLATSTR(""));
 		utility::string_t content_type(_XPLATSTR("text/plain"));
-
 		web::http::http_headers headers;
 		headers.add(_XPLATSTR("Metadata"), _XPLATSTR("true"));
-		return http_call_async(auth_uri, payload_body, web::http::methods::GET, content_type, headers);
+
+		return http_call_async(auth_uri, payload_body, web::http::methods::GET, content_type, headers).then([](web::json::value json_object)
+			{
+				return json_object.at(_XPLATSTR("access_token")).as_string();
+			});
 	}
 }}} // namespace azure::authentication::utility
 
@@ -113,7 +112,7 @@ namespace azure { namespace storage { namespace samples {
     {
         try
         {
-			utility::string_t access_token = azure::authentication::utility::get_access_token_from_service_principal(aad_authority, aad_resource, aad_tenant_id, aad_application_id, aad_application_secret).get();
+			utility::string_t access_token = azure::authentication::utility::get_access_token_from_service_principal_async(aad_authority, aad_resource, aad_tenant_id, aad_application_id, aad_application_secret).get();
         }
         catch (const std::exception& e)
         {
