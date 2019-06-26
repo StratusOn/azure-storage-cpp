@@ -38,7 +38,8 @@ namespace azure { namespace authentication { namespace utility {
 		const utility::string_t& body,
 		const web::http::method method,
 		const utility::string_t& content_type,
-		const web::http::http_headers& headers)
+		const web::http::http_headers& headers,
+		web::http::status_code& status_code)
 	{
 		web::http::client::http_client client(uri);
 
@@ -46,11 +47,12 @@ namespace azure { namespace authentication { namespace utility {
 		request.set_body(body, content_type);
 		request.headers() = headers;
 
-		return client.request(request).then([](web::http::http_response response)
+		return client.request(request).then([&status_code](web::http::http_response response)
 			{
 				//ucout << _XPLATSTR("Response Status Code: ") << response.status_code() << std::endl;
 				//ucout << _XPLATSTR("Content type: ") << response.headers().content_type() << std::endl;
 				//ucout << _XPLATSTR("Content length: ") << response.headers().content_length() << std::endl;
+				status_code = response.status_code();
 
 				return response.extract_json().get();
 			});
@@ -78,8 +80,9 @@ namespace azure { namespace authentication { namespace utility {
 
 		utility::string_t content_type(_XPLATSTR("application/x-www-form-urlencoded"));
 		web::http::http_headers headers;
+		web::http::status_code status_code(web::http::status_codes::NotImplemented);
 
-		return http_call_async(auth_uri, payload_body, web::http::methods::POST, content_type, headers).then([](web::json::value json_object)
+		return http_call_async(auth_uri, payload_body, web::http::methods::POST, content_type, headers, status_code).then([&status_code](web::json::value json_object)
 			{
 				return json_object.at(_XPLATSTR("access_token")).as_string();
 			});
@@ -98,8 +101,9 @@ namespace azure { namespace authentication { namespace utility {
 		utility::string_t content_type(_XPLATSTR("text/plain"));
 		web::http::http_headers headers;
 		headers.add(_XPLATSTR("Metadata"), _XPLATSTR("true"));
+		web::http::status_code status_code(web::http::status_codes::NotImplemented);
 
-		return http_call_async(auth_uri, payload_body, web::http::methods::GET, content_type, headers).then([](web::json::value json_object)
+		return http_call_async(auth_uri, payload_body, web::http::methods::GET, content_type, headers, status_code).then([](web::json::value json_object)
 			{
 				return json_object.at(_XPLATSTR("access_token")).as_string();
 			});
